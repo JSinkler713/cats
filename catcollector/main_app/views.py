@@ -14,17 +14,32 @@ def cats_index(request):
     cats = Cat.objects.all()
     return render(request, 'cats/index.html', { 'cats': cats })
 
-def cats_detail(request, cat_id):
-    cat = Cat.objects.get(id=cat_id)
-    return render(request, 'cats/detail.html', { 'cat': cat })
 
+# adds a view function for showing a single cat's data
+def cats_detail(request, cat_id):
+    # retrieve a cat from the DB using the ID
+    cat_data = Cat.objects.get(id=cat_id)
+    # return the detail template with the data for a signle cat
+    return render(request, 'cats/detail.html', { 'cat': cat_data })
+
+
+# When creating something in the database we need a combined view function like this one
+# We call it combined because it handles both POST (or DELETE or PUT) and GET requests
 def new_cat(request):
+    # If a post request is made to this view function
     if request.method == 'POST':
+        # We save the form data to a new variable
         form = CatForm(request.POST)
+        # We make sure the data passes validations
         if form.is_valid():
+            # If it does, save it in the database
             cat = form.save()
+            # Redirect the user to the new cat's detail page
             return redirect('detail', cat.id)
     else:
+        # If it's a get request, load the form from forms.py
         form = CatForm()
+    # Save the form to a new variable
     context = { 'form': form }
+    # Render the cat form template with the form
     return render(request, 'cats/cat_form.html', context)

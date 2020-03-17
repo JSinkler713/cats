@@ -1,6 +1,6 @@
 from django.db import models
 
-# Anytime we make a change in this file, we need to generate a migrations file
+# Anytime we add a new model or modify a model's properties/columns/fields, we need to generate a migrations file
 # Once a new migration file is created, we need to run it
 
 # Create your models here.
