@@ -27,7 +27,7 @@ class Cat(models.Model):
 class Feeding(models.Model):
     # fields include a Date type column 
     # and a Character (string) type column
-    date = models.DateField()
+    date = models.DateField('feeding date')
     meal = models.CharField(
         max_length=1,
         # add the 'choices' field option (built into Django)

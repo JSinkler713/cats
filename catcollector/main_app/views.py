@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 # this allows us to interact with out Cat model in view functions
 from .models import Cat
-from .forms import CatForm
+from .forms import CatForm, FeedingForm
 
 # Create your views here.
 def home(request):
@@ -14,14 +14,17 @@ def cats_index(request):
     cats = Cat.objects.all()
     return render(request, 'cats/index.html', { 'cats': cats })
 
-
 # adds a view function for showing a single cat's data
 def cats_detail(request, cat_id):
     # retrieve a cat from the DB using the ID
     cat_data = Cat.objects.get(id=cat_id)
+    # instantiate a new FeedingForm to be rendered in the template
+    feeding_form = FeedingForm()
     # return the detail template with the data for a signle cat
-    return render(request, 'cats/detail.html', { 'cat': cat_data })
-
+    return render(request, 'cats/detail.html', { 
+        'cat': cat_data,
+        'feeding_form': feeding_form 
+    })
 
 # When creating something in the database we need a combined view function like this one
 # We call it combined because it handles both POST (or DELETE or PUT) and GET requests
