@@ -7,4 +7,5 @@ urlpatterns = [
     path('cats/', views.cats_index, name='index'),
     path('cats/new/', views.new_cat, name='new_cat'),
     path('cats/<int:cat_id>/', views.cats_detail, name='detail'),
+    path('cats/<int:cat_id>/add_feeding/', views.add_feeding, name='add_feeding')
 ]

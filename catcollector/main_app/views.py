@@ -25,6 +25,24 @@ def cats_detail(request, cat_id):
         'cat': cat_data,
         'feeding_form': feeding_form 
     })
+    # render takes arguments for the request, 
+    # the template and the context
+
+
+
+def add_feeding(request, cat_id):
+    # create the ModelForm using the data in request.POST
+    form = FeedingForm(request.POST)
+    # validate the form
+    if form.is_valid():
+        # don't save it to DB until cat_id is assigned
+        new_feeding = form.save(commit=False)
+        new_feeding.cat_id = cat_id
+        new_feeding.save()
+    # the 'detail' in the redirect takes a path's name (from urls.py)
+    # and sends the user to that page using the name
+    return redirect('detail', cat_id=cat_id)
+
 
 # When creating something in the database we need a combined view function like this one
 # We call it combined because it handles both POST (or DELETE or PUT) and GET requests

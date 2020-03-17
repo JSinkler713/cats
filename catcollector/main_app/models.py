@@ -43,3 +43,7 @@ class Feeding(models.Model):
     def __str__(self):
         # show a user-friendly output for the value of Field.choice
         return f'{self.get_meal_display()} on {self.date}'
+    
+    # use the meta class to change the sorting order
+    class Meta:
+        ordering = ['-date']
