@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import date
 
 # Anytime we add a new model or modify a model's properties/columns/fields, we need to generate a migrations file
 # Once a new migration file is created, we need to run it
@@ -22,6 +23,10 @@ class Cat(models.Model):
     # Makes sure we print the cats name and not a confusing model object
     def __str__(self):
         return self.name
+
+    # add this new method
+    def fed_for_today(self):
+        return self.feeding_set.filter(date=date.today()).count() >= len(MEALS)
 
 # Adds a new model to our DB
 class Feeding(models.Model):
