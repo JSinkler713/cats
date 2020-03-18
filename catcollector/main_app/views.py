@@ -1,6 +1,11 @@
 from django.shortcuts import render, redirect
-# this allows us to interact with out Cat model in view functions
-from .models import Cat
+
+# these imports are strictly for use with Class-based views
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView
+
+# this allows us to interact with out Cat and Toy models in view functions
+from .models import Cat, Toy
 from .forms import CatForm, FeedingForm
 
 # Create your views here.
@@ -27,7 +32,6 @@ def cats_detail(request, cat_id):
     })
     # render takes arguments for the request, 
     # the template and the context
-
 
 
 def add_feeding(request, cat_id):
@@ -64,3 +68,50 @@ def new_cat(request):
     context = { 'form': form }
     # Render the cat form template with the form
     return render(request, 'cats/cat_form.html', context)
+
+
+#------------------------------------
+# Class-based Views for the Toy model
+#------------------------------------
+# CBVs are great for getting basic CRUD functionality 
+# up and running in a very short period of time. However,
+# CBVs are not a coding pattern that you are likely to see
+# in production Django apps. We used them here to free up 
+# time for lessons. Read the documentation below to get a
+# brief introduction CBVs.
+
+# CBVs fall into 5 types: List, Detail, Create, Update, Delete
+# Notice that each class below inherits from one of those 5 types
+
+# List and Detail Views are the easiest to set up; all we need to 
+# do is declare the model we want to build a view for.
+class ToyList(ListView):
+  # This line associates the ListView with the Toy model
+  model = Toy
+
+class ToyDetail(DetailView):
+  model = Toy
+
+# The editable view types include Create, Update, and Delete
+# They're also relatively easy to set up but require a little more work
+class ToyCreate(CreateView):
+  model = Toy
+  # The CreateView requires a field property to set
+  # Here we are saying that all fields associated with a Toy should 
+  # be displayed in the form
+  fields = '__all__'
+  # This CBV will render the template toy_form.html  
+
+class ToyUpdate(UpdateView):
+  model = Toy
+  # In the UpdateView we set the name and color fields as the only two in the form
+  fields = ['name', 'color']
+  # This CBV will render the template toy_form.html as well
+
+
+class ToyDelete(DeleteView):
+  model = Toy
+  # The DeleteView requires a success_url be declared to redirect 
+  # the user to when they successfully delete a toy
+  success_url = '/toys/'
+  # This CBV will render the toy_confirm_delete.html template
