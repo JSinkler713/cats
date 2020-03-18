@@ -8,9 +8,10 @@ urlpatterns = [
     path('cats/new/', views.new_cat, name='new_cat'),
     path('cats/<int:cat_id>/', views.cats_detail, name='detail'),
     path('cats/<int:cat_id>/add_feeding/', views.add_feeding, name='add_feeding'),
+    path('cats/<int:cat_id>/assoc_toy/<int:toy_id>/', views.assoc_toy, name="assoc_toy"),
     #------------------------------------------
     # full CRUD routes for Toys below:
-    path('toys/', views.ToyList.as_view(), name='toys_index'),
+    path('toys/', views.toy_index, name='toys_index'),
     # primary keys (or 'pk') is used instead of cat_id 
     # because Class-Based Views require it
     path('toys/<int:pk>/', views.ToyDetail.as_view(), name='toys_detail'),

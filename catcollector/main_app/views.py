@@ -11,7 +11,7 @@ from .forms import CatForm, FeedingForm
 # Create your views here.
 def home(request):
     return render(request, 'home.html')
-
+ 
 def about(request):
     return render(request, 'about.html')
 
@@ -23,16 +23,23 @@ def cats_index(request):
 def cats_detail(request, cat_id):
     # retrieve a cat from the DB using the ID
     cat_data = Cat.objects.get(id=cat_id)
+    # get all toys that this cat does not have an association
+    toys_cat_doesnt_have = Toy.objects.exclude(id__in = cat_data.toys.all().values_list('id')) # [2, 1, 3]
     # instantiate a new FeedingForm to be rendered in the template
     feeding_form = FeedingForm()
     # return the detail template with the data for a signle cat
     return render(request, 'cats/detail.html', { 
         'cat': cat_data,
-        'feeding_form': feeding_form 
+        'feeding_form': feeding_form,
+        'toys': toys_cat_doesnt_have 
     })
     # render takes arguments for the request, 
     # the template and the context
 
+def assoc_toy(request, cat_id, toy_id):
+    # The add method accepts both the whole model object or its ID for associations
+    Cat.objects.get(id=cat_id).toys.add(toy_id)
+    return redirect('detail', cat_id=cat_id)
 
 def add_feeding(request, cat_id):
     # create the ModelForm using the data in request.POST
@@ -85,9 +92,14 @@ def new_cat(request):
 
 # List and Detail Views are the easiest to set up; all we need to 
 # do is declare the model we want to build a view for.
-class ToyList(ListView):
+# class ToyList(ListView):
   # This line associates the ListView with the Toy model
-  model = Toy
+  # model = Toy
+
+def toy_index(request):
+    toys = Toy.objects.all()
+    print(toys)
+    return render(request, 'main_app/toy_list.html', { 'toys': toys })
 
 class ToyDetail(DetailView):
   model = Toy

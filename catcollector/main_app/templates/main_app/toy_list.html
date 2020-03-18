@@ -3,7 +3,7 @@
 
 <h1>Toy List</h1>
 
-{% for toy in toy_list %}
+{% for toy in toys %}
   <a href="{% url 'toys_detail' toy.id %}">
     <div class="card">
         <div class="card-content">

@@ -21,6 +21,7 @@ class Toy(models.Model):
   def __str__(self):
     return self.name
 
+  # This method is required for CBV usage
   def get_absolute_url(self):
     return reverse('toys_detail', kwargs={'pk': self.id})
 
@@ -32,6 +33,8 @@ class Cat(models.Model):
     breed = models.CharField(max_length=100)
     description = models.TextField(max_length=250)
     age = models.IntegerField()
+    # Adds a M:M relationship between Cats and Toys
+    toys = models.ManyToManyField(Toy)
 
     # Makes sure we print the cats name and not a confusing model object
     def __str__(self):
