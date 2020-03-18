@@ -1,0 +1,35 @@
+[
+  {
+    "model": "main_app.cat",
+    "pk": 1,
+    "fields": {
+      "name": "Teddy",
+      "breed": "Bichon",
+      "description": "Evil looking cuddle monster",
+      "age": 2,
+      "toys": [1]
+    }
+  },
+  {
+    "model": "main_app.cat",
+    "pk": 2,
+    "fields": {
+      "name": "Maki",
+      "breed": "Flamepoint Siamese",
+      "description": "Lazy but ornery & cute",
+      "age": 9,
+      "toys": [2]
+    }
+  },
+  {
+    "model": "main_app.cat",
+    "pk": 3,
+    "fields": {
+      "name": "Whiskers",
+      "breed": "Maine Coon",
+      "description": "He's a chonky boi!",
+      "age": 3,
+      "toys": [3]
+    }
+  }
+]
