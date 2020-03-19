@@ -76,6 +76,21 @@ def new_cat(request):
     # Render the cat form template with the form
     return render(request, 'cats/cat_form.html', context)
 
+def cats_update(request, cat_id):
+    cat = Cat.objects.get(id=cat_id)
+    if request.method == "POST":
+        form = CatForm(request.POST, instance=cat)
+        if form.is_valid():
+            cat = form.save()
+            return redirect('detail', cat_id)
+    else:
+        form = CatForm(instance=cat)
+    return render(request, 'cats/cat_form.html', { 'form': form })
+
+
+def cats_delete(request, cat_id):
+    Cat.objects.get(id=cat_id).delete()
+    return redirect('index')
 
 #------------------------------------
 # Class-based Views for the Toy model
