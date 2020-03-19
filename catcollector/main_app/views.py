@@ -91,7 +91,8 @@ def cats_update(request, cat_id):
 
 
 def cats_delete(request, cat_id):
-    pass
+    Cat.objects.get(id=cat_id).delete()
+    return redirect('index')
 
 #------------------------------------
 # Class-based Views for the Toy model
