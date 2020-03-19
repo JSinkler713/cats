@@ -4,6 +4,14 @@ from django.shortcuts import render, redirect
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView, DetailView
 
+# import auth packages and form
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
+
+# import the login_required decorator
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 # this allows us to interact with out Cat and Toy models in view functions
 from .models import Cat, Toy
 from .forms import CatForm, FeedingForm
@@ -15,11 +23,14 @@ def home(request):
 def about(request):
     return render(request, 'about.html')
 
+@login_required
 def cats_index(request):
-    cats = Cat.objects.all()
+    cats = Cat.objects.filter(user=request.user)
     return render(request, 'cats/index.html', { 'cats': cats })
 
+
 # adds a view function for showing a single cat's data
+@login_required
 def cats_detail(request, cat_id):
     # retrieve a cat from the DB using the ID
     cat_data = Cat.objects.get(id=cat_id)
@@ -36,11 +47,13 @@ def cats_detail(request, cat_id):
     # render takes arguments for the request, 
     # the template and the context
 
+@login_required
 def assoc_toy(request, cat_id, toy_id):
     # The add method accepts both the whole model object or its ID for associations
     Cat.objects.get(id=cat_id).toys.add(toy_id)
     return redirect('detail', cat_id=cat_id)
 
+@login_required
 def add_feeding(request, cat_id):
     # create the ModelForm using the data in request.POST
     form = FeedingForm(request.POST)
@@ -55,8 +68,12 @@ def add_feeding(request, cat_id):
     return redirect('detail', cat_id=cat_id)
 
 
-# When creating something in the database we need a combined view function like this one
-# We call it combined because it handles both POST (or DELETE or PUT) and GET requests
+# When creating something in the database we need a 
+# combined view function like this one
+
+# We call it combined because it handles both POST (or 
+# DELETE or PUT) and GET requests
+@login_required
 def new_cat(request):
     # If a post request is made to this view function
     if request.method == 'POST':
@@ -64,8 +81,11 @@ def new_cat(request):
         form = CatForm(request.POST)
         # We make sure the data passes validations
         if form.is_valid():
-            # If it does, save it in the database
-            cat = form.save()
+            # If it does, associate cat with logged in user and 
+            # save it in the database
+            cat = form.save(commit=False)
+            cat.user = request.user
+            cat.save()
             # Redirect the user to the new cat's detail page
             return redirect('detail', cat.id)
     else:
@@ -76,6 +96,8 @@ def new_cat(request):
     # Render the cat form template with the form
     return render(request, 'cats/cat_form.html', context)
 
+
+@login_required
 def cats_update(request, cat_id):
     cat = Cat.objects.get(id=cat_id)
     if request.method == "POST":
@@ -88,9 +110,34 @@ def cats_update(request, cat_id):
     return render(request, 'cats/cat_form.html', { 'form': form })
 
 
+@login_required
 def cats_delete(request, cat_id):
     Cat.objects.get(id=cat_id).delete()
     return redirect('index')
+
+
+def signup(request):
+    error_message = ''
+    if request.method == "POST":
+        # This is how to create User form object
+        # that includes data from the browser
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            # This adds the user to the DB
+            user = form.save()
+            # This is how we log in a user via code
+            login(request, user)
+            return redirect('index')
+        else:
+            error_message = 'Invalid sign up - try again!'
+    # A bad POST or a regular GET request, so render 
+    # signup.html with an empty form
+    form = UserCreationForm()
+    context = {
+        'form': form,
+        'error_message': error_message
+    }
+    return render(request, 'registration/signup.html', context)
 
 #------------------------------------
 # Class-based Views for the Toy model
@@ -111,17 +158,18 @@ def cats_delete(request, cat_id):
   # This line associates the ListView with the Toy model
   # model = Toy
 
+@login_required
 def toy_index(request):
     toys = Toy.objects.all()
     print(toys)
     return render(request, 'main_app/toy_list.html', { 'toys': toys })
 
-class ToyDetail(DetailView):
+class ToyDetail(LoginRequiredMixin, DetailView):
   model = Toy
 
 # The editable view types include Create, Update, and Delete
 # They're also relatively easy to set up but require a little more work
-class ToyCreate(CreateView):
+class ToyCreate(LoginRequiredMixin, CreateView):
   model = Toy
   # The CreateView requires a field property to set
   # Here we are saying that all fields associated with a Toy should 
@@ -129,14 +177,14 @@ class ToyCreate(CreateView):
   fields = '__all__'
   # This CBV will render the template toy_form.html  
 
-class ToyUpdate(UpdateView):
+class ToyUpdate(LoginRequiredMixin, UpdateView):
   model = Toy
   # In the UpdateView we set the name and color fields as the only two in the form
   fields = ['name', 'color']
   # This CBV will render the template toy_form.html as well
 
 
-class ToyDelete(DeleteView):
+class ToyDelete(LoginRequiredMixin, DeleteView):
   model = Toy
   # The DeleteView requires a success_url be declared to redirect 
   # the user to when they successfully delete a toy
