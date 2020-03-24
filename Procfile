@@ -1,1 +1,1 @@
-web: gunicorn catcollector.catcollector.wsgi
+web: gunicorn catcollector.wsgi
