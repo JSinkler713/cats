@@ -2,6 +2,8 @@ from django.db import models
 from datetime import date
 # this import is used with CBVs (see Toy:get_absolute_url())
 from django.urls import reverse
+# Import the User model provided by Django
+from django.contrib.auth.models import User
 
 # Anytime we add a new model or modify a model's properties/columns/fields, we need to generate a migrations file
 # Once a new migration file is created, we need to run it
@@ -35,6 +37,8 @@ class Cat(models.Model):
     age = models.IntegerField()
     # Adds a M:M relationship between Cats and Toys
     toys = models.ManyToManyField(Toy)
+    # Adds a 1:M relationship between a User and their Cats
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     # Makes sure we print the cats name and not a confusing model object
     def __str__(self):

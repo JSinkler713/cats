@@ -120,8 +120,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+LOGIN_REDIRECT_URL = '/cats/'
+LOGOUT_REDIRECT_URL = '/'
 
 import django_heroku
-
 # configure our django app for heroku
 django_heroku.settings(locals())
