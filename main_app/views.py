@@ -19,9 +19,10 @@ from .forms import CatForm, FeedingForm
 #s3 and boto
 import uuid
 import boto3
+import os
 
 S3_BASE_URL = 'https://s3-us-west-1.amazonaws.com/'
-BUCKET = 'catsforever'
+S3_BUCKET = os.environ['S3_BUCKET']
 
 # Create your views here.
 def home(request):
@@ -89,9 +90,9 @@ def add_photo(request, cat_id):
         key = uuid.uuid4().hex[:6] + photo_file.name[photo_file.name.rfind('.'):]
         # just in case something goes wrong
         try:
-            s3.upload_fileobj(photo_file, BUCKET, key)
+            s3.upload_fileobj(photo_file, S3_BUCKET, key)
             # build the full url string
-            url = f"{S3_BASE_URL}{BUCKET}/{key}"
+            url = f"{S3_BASE_URL}{S3_BUCKET}/{key}"
             # we can assign to cat_id or cat (if you have a cat object)
             photo = Photo(url=url, cat_id=cat_id)
             photo.save()
