@@ -11,6 +11,7 @@ urlpatterns = [
     path('cats/<int:cat_id>/delete', views.cats_delete, name='cats_delete'),
     path('cats/<int:cat_id>/add_feeding/', views.add_feeding, name='add_feeding'),
     path('cats/<int:cat_id>/assoc_toy/<int:toy_id>/', views.assoc_toy, name="assoc_toy"),
+    path('cats/<int:cat_id>/add_photo/', views.add_photo, name='add_photo'),
     #------------------------------------------
     # full CRUD routes for Toys below:
     path('toys/', views.toy_index, name='toys_index'),

@@ -13,8 +13,15 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 # this allows us to interact with out Cat and Toy models in view functions
-from .models import Cat, Toy
+from .models import Cat, Toy, Photo
 from .forms import CatForm, FeedingForm
+
+#s3 and boto
+import uuid
+import boto3
+
+S3_BASE_URL = 'https://s3-us-west-1.amazonaws.com/'
+BUCKET = 'catsforever'
 
 # Create your views here.
 def home(request):
@@ -34,18 +41,22 @@ def cats_index(request):
 def cats_detail(request, cat_id):
     # retrieve a cat from the DB using the ID
     cat_data = Cat.objects.get(id=cat_id)
-    # get all toys that this cat does not have an association
-    toys_cat_doesnt_have = Toy.objects.exclude(id__in = cat_data.toys.all().values_list('id')) # [2, 1, 3]
-    # instantiate a new FeedingForm to be rendered in the template
-    feeding_form = FeedingForm()
-    # return the detail template with the data for a signle cat
-    return render(request, 'cats/detail.html', { 
-        'cat': cat_data,
-        'feeding_form': feeding_form,
-        'toys': toys_cat_doesnt_have 
-    })
-    # render takes arguments for the request, 
-    # the template and the context
+    # Make sure you have the right user trying to access cat
+    if (cat_data.user == request.user):
+        # get all toys that this cat does not have an association
+        toys_cat_doesnt_have = Toy.objects.exclude(id__in = cat_data.toys.all().values_list('id')) # [2, 1, 3]
+        # instantiate a new FeedingForm to be rendered in the template
+        feeding_form = FeedingForm()
+        # return the detail template with the data for a signle cat
+        # render takes arguments for the request, 
+        # the template and the context
+        return render(request, 'cats/detail.html', { 
+            'cat': cat_data,
+            'feeding_form': feeding_form,
+            'toys': toys_cat_doesnt_have 
+        })
+    else:
+        return redirect('home')
 
 @login_required
 def assoc_toy(request, cat_id, toy_id):
@@ -67,6 +78,26 @@ def add_feeding(request, cat_id):
     # and sends the user to that page using the name
     return redirect('detail', cat_id=cat_id)
 
+
+#Add login required
+def add_photo(request, cat_id):
+    # photo-file will be the "name" attribute on the <input type="file">
+    photo_file = request.FILES.get('photo-file', None)
+    if photo_file:
+        s3 = boto3.client('s3')
+        # need a unique "key" for S3 / needs image file extension too
+        key = uuid.uuid4().hex[:6] + photo_file.name[photo_file.name.rfind('.'):]
+        # just in case something goes wrong
+        try:
+            s3.upload_fileobj(photo_file, BUCKET, key)
+            # build the full url string
+            url = f"{S3_BASE_URL}{BUCKET}/{key}"
+            # we can assign to cat_id or cat (if you have a cat object)
+            photo = Photo(url=url, cat_id=cat_id)
+            photo.save()
+        except:
+            print('An error occurred uploading file to S3')
+    return redirect('detail', cat_id=cat_id)
 
 # When creating something in the database we need a 
 # combined view function like this one
