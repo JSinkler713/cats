@@ -22,7 +22,7 @@ import boto3
 import os
 
 S3_BASE_URL = 'https://s3-us-west-1.amazonaws.com/'
-S3_BUCKET = os.environ['S3_BUCKET']
+S3_BUCKET = 'catsforever'
 
 # Create your views here.
 def home(request):
