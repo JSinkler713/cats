@@ -129,3 +129,16 @@ LOGOUT_REDIRECT_URL = '/'
 import django_heroku
 # configure our django app for heroku
 django_heroku.settings(locals())
+
+try:
+  with open('./secret.txt') as f:
+    TEST_VAR = f.read().strip()
+except:
+    print('did not load')
+    # if no secret.txt look for env variable in os.environ
+    # if in Heroku should look at whatever we set for env variables
+    import os
+    TEST_VAR = os.environ['TEST_VAR']
+    print(TEST_VAR)
+    pass
+

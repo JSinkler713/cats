@@ -86,8 +86,11 @@ def add_photo(request, cat_id):
     photo_file = request.FILES.get('photo-file', None)
     if photo_file:
         s3 = boto3.client('s3')
+        print('photo_file', photo_file)
         # need a unique "key" for S3 / needs image file extension too
+        print('s3', s3)
         key = uuid.uuid4().hex[:6] + photo_file.name[photo_file.name.rfind('.'):]
+        print('key',key)
         # just in case something goes wrong
         try:
             s3.upload_fileobj(photo_file, S3_BUCKET, key)
